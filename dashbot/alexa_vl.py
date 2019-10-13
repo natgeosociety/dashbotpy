@@ -7,32 +7,39 @@ from .version import __version__
 from . import alexa
 
 class alexa_vl(alexa.alexa):
-    
+
     def __init__(self,apiKey=None,debug=False,printErrors=False):
-        
+
         if 'DASHBOT_SERVER_ROOT' in os.environ:
             serverRoot = os.environ['DASHBOT_SERVER_ROOT']
         else:
-            serverRoot = 'https://tracker.dashbot.io'        
-        self.urlRoot = serverRoot + '/track'        
+            serverRoot = 'https://tracker.dashbot.io'
+        request_timeout = 0.01
+        try:
+            if 'DASHBOT_REQUEST_TIMEOUT' in os.environ:
+                request_timeout = int(os.environ['DASHBOT_REQUEST_TIMEOUT'])
+        except:
+            pass
+        self.urlRoot = serverRoot + '/track'
         self.apiKey=apiKey
         self.debug=debug
         self.printErrors=printErrors
         self.platform='alexa'
         self.version = __version__
         self.source = 'pip_vl'
-    
-    #vl initialize     
-    def initialize(self,apiKey,session): 
+        self.request_timeout = request_timeout
+
+    #vl initialize
+    def initialize(self,apiKey,session):
         self.apiKey=apiKey
         self.session=session
-        
-    #vl track    
+
+    #vl track
     def track(self,intent_name,intent_request,response):
         event = self.regenerateEvent(intent_request)
         self.logIncoming(event)
         self.logOutgoing(event,response)
-        
+
     #vl helper
     def regenerateEvent(self,intent_request):
         event = {
@@ -46,7 +53,7 @@ class alexa_vl(alexa.alexa):
             }
         }
         return event
-    
+
     #vl helper
     def generateResponse(self,speechText):
         if speechText[0:7]=='<speak>':
@@ -56,7 +63,7 @@ class alexa_vl(alexa.alexa):
                         'type':'SSML',
                         'ssml': speechText
                     }
-                }       
+                }
             }
         else:
             return {

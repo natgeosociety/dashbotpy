@@ -10,6 +10,12 @@ class rasa(generic.generic):
             serverRoot = os.environ['DASHBOT_SERVER_ROOT']
         else:
             serverRoot = 'https://tracker.dashbot.io'
+        request_timeout = 0.01
+        try:
+            if 'DASHBOT_REQUEST_TIMEOUT' in os.environ:
+                request_timeout = int(os.environ['DASHBOT_REQUEST_TIMEOUT'])
+        except:
+            pass
         self.urlRoot = serverRoot + '/track'
         self.apiKey = apiKey
         self.debug = debug
@@ -17,6 +23,7 @@ class rasa(generic.generic):
         self.platform = 'rasa'
         self.version = __version__
         self.source = 'pip'
+        self.request_timeout = request_timeout
 
     def logIncoming(self, data):
         url = self.urlRoot + '?apiKey=' + self.apiKey + '&type=incoming&platform=' + self.platform + '&v=' + self.version + '-' + self.source
